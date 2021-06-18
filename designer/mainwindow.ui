@@ -99,19 +99,60 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="data_out">
+    <widget class="QLabel" name="title_out">
      <property name="geometry">
       <rect>
        <x>480</x>
-       <y>50</y>
+       <y>90</y>
        <width>651</width>
-       <height>400</height>
+       <height>91</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
      </property>
      <property name="text">
       <string/>
      </property>
     </widget>
+    <widget class="QLabel" name="subtitle_out">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>260</y>
+       <width>651</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="file_data">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>10</y>
+      <width>481</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
