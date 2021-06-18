@@ -16,12 +16,15 @@ def create_audio_recording(seconds = 3, fs = 44100):
 
     write(filename, fs, myrecording)  # Save as WAV file
 
+    return filename
+
+
 def get_peaks():
     time = []
     frequency = []
     magnitude = []
 
-    f = open("../examples/data/songdata.json")
+    f = open('..\\examples\\data\\songdata.json')
     data = json.load(f)
     for freq_ranges in data["frequency_band_to_peaks"].items():
         print(freq_ranges)
@@ -29,6 +32,7 @@ def get_peaks():
             frequency.append(peaks["_frequency_hz"])
             magnitude.append(peaks["peak_magnitude"])
             time.append(peaks["_seconds"])
+    f.close()
     return np.array(frequency), np.array(time), np.array(magnitude)
 
 

@@ -14,11 +14,14 @@ from PyQt5.QtGui import QFont, QPixmap
 import matplotlib.pyplot as plt
 import sounddevice as sd
 from scipy.io.wavfile import write
+import numpy as np
 from pydub import AudioSegment
 import os
 import asyncio
+import wave
 
 # Project modules
+from src.shazamtools import *
 import shazamio as sh
 from src.ui.mainwindow import Ui_MainWindow
 from PIL import Image
@@ -85,14 +88,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         d.setWindowTitle("Recording...")
         d.resize(300, 200)
         d.show()
-        myrecording = create_audio_recording(3)
+        self.filename = create_audio_recording(3)
         sd.wait()  # Wait until recording is finished
         self.clear_screen()
         self.file_data.setText("Audio selected.")
 
     def begin(self):
         if self.filename:
+
+            # Read file to get buffer
             self.file_data.setText("Finding song...")
+            name, extension = os.path.splitext(self.filename)
+            if extension != '.wav':
+                sound = AudioSegment.from_mp3(self.filename)
+                current_path = os.path.dirname(os.path.abspath(__file__))
+                self.filename = os.path.join(current_path, "extra_files", "audio_file.wav")
+                sound.export(self.filename, format="wav")
+            ifile = wave.open(self.filename)
+            samples = ifile.getnframes()
+            audio = ifile.readframes(samples)
+
+            # Convert buffer to float32 using NumPy
+            audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
+            audio_as_np_float32 = audio_as_np_int16.astype(np.float32)
+
+            # Normalise float32 array so that values are between -1.0 and +1.0
+            max_int16 = 2 ** 15
+            audio_normalised = audio_as_np_float32 / max_int16
+            self.audio_data = audio_normalised
+
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.get_shazam_data())
             self.file_data.setText("Song found!")
@@ -109,22 +133,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.spectrogram()
         else:
             msgbox = QMessageBox(QMessageBox.Information, "No File Selected!", "No se seleccionó un archivo!")
+            self.file_data.setText("No file selected!")
             msgbox.addButton(QMessageBox.Close)
             msgbox.setDefaultButton(QMessageBox.Close)
             msgbox.exec()
 
     async def get_shazam_data(self):
         if self.filename:
-            file = await sh.utils.load_file(self.filename, 'rb')
-            self.audio_data = sh.converter.Converter.normalize_audio_data(file).raw_data
             self.out = await self.shazam.recognize_song(self.filename)
 
     def spectrogram(self):
 
+        f, t, a = get_peaks()
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6))
         fig.patch.set_facecolor((0.75, 0.75, 0.75))
         ax.patch.set_facecolor((0.0, 0.0, 0.0))
         Pxx, freqs, bins, im = ax.specgram(self.audio_data, NFFT=1024, Fs=16000, noverlap=900)
         ax.set_ylabel('Frecuencia [Hz]')
         ax.set_xlabel('Tiempo [s]')
+        ax.scatter(t, f)
         plt.show()

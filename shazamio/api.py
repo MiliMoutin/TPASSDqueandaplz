@@ -225,7 +225,7 @@ class Shazam(Converter, Geo):
         results = await self.send_recognize_request(signature)
         a = signature.encode_to_json()
 
-        with open('../examples/data/songdata.json', 'w') as outfile:
+        with open('..\\examples\\data\\songdata.json', 'w') as outfile:
             json.dump(a, outfile)
         return results
 
