@@ -1,5 +1,7 @@
 # PyQt5 modules
 import urllib
+from src.shazamtools import *
+import contextlib
 
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QDialog, QApplication, QWidget, QPushButton, QAction, \
     QLineEdit, \
@@ -38,6 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.out = None
         self.audio_data = None
         self.im = None
+        self.a=0
         self.text_out = None
 
     def openFile(self):
@@ -63,7 +66,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.title_out.clear()
         self.subtitle_out.clear()
 
-    def StartRecording(self, seconds=3, fs=44100):
+    def StartRecording(self, seconds=int(3), fs=44100):
+        """"
         open = True
         if self.filename:
             open = False
@@ -76,18 +80,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if reply == QMessageBox.Yes:
                 open = True
         if open:
-            d = QDialog()
-            d.setWindowTitle("Recording...")
-            d.resize(300, 200)
-            d.show()
-            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
-            sd.wait()  # Wait until recording is finished
-            d.close()
-            current_path = os.path.dirname(os.path.abspath(__file__))
-            self.filename = os.path.join(current_path, "recording", "recording.ogg")
-            write(self.filename, fs, myrecording)  # Save as WAV file
-            self.clear_screen()
-            self.file_data.setText("Audio selected.")
+        """
+        d = QDialog()
+        d.setWindowTitle("Recording...")
+        d.resize(300, 200)
+        d.show()
+        myrecording = create_audio_recording(3)
+        sd.wait()  # Wait until recording is finished
+        self.clear_screen()
+        self.file_data.setText("Audio selected.")
 
     def begin(self):
         if self.filename:
