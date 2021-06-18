@@ -1,7 +1,7 @@
 import pathlib
 import uuid
 import time
-
+import json
 import typing
 
 from .signature import DecodedMessage
@@ -222,8 +222,10 @@ class Shazam(Converter, Geo):
         signature = signature_generator.get_next_signature()
         while not signature:
             signature = signature_generator.get_next_signature()
-        signature.encode_to_json()
         results = await self.send_recognize_request(signature)
+        a = signature.encode_to_json()
+        with open('songdata.txt', 'w') as outfile:
+            json.dump(a, outfile)
         return results
 
     async def send_recognize_request(self, sig: DecodedMessage) -> typing.Union[ShazamResponse, dict]:

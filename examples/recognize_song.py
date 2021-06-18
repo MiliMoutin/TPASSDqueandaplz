@@ -3,8 +3,8 @@ from shazamio import Shazam
 
 async def main():
     shazam = Shazam()
-    out = await shazam.recognize_song('data/dora.ogg')
-    print(out)
+    out = await shazam.recognize_song('data/cancion.wav')
+    print(out["track"]["title"]+", from "+out["track"]["subtitle"])
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
