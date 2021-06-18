@@ -1,7 +1,6 @@
 import asyncio
 from shazamio import Shazam
 
-
 async def main():
     shazam = Shazam()
     out = await shazam.recognize_song('data/dora.ogg')
