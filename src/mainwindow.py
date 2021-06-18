@@ -125,20 +125,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(self.get_shazam_data())
                 self.file_data.setText("Song found!")
-                track = self.out.get("track")
-                images = track.get("images")
-                cover_image = images.get("coverart")
                 try:
+                    track = self.out.get("track")
+                    images = track.get("images")
+                    cover_image = images.get("coverart")
                     urllib.request.urlretrieve(cover_image, "sample.png")
                     self.im = QPixmap("sample.png")
                     self.image_out.setPixmap(self.im)
+                    title = track.get("title")
+                    subtitle = track.get("subtitle")
+                    self.title_out.setText(title)
+                    self.subtitle_out.setText(subtitle)
                 except:
+                    self.file_data.setText("Song not found!")
                     self.image_out.setText("No Image Found!")
 
-                title = track.get("title")
-                subtitle = track.get("subtitle")
-                self.title_out.setText(title)
-                self.subtitle_out.setText(subtitle)
+
                 self.spectrogram()
         else:
             msgbox = QMessageBox(QMessageBox.Information, "No File Selected!", "No se seleccionó un archivo!")
@@ -157,7 +159,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6))
         fig.patch.set_facecolor((0.75, 0.75, 0.75))
         ax.patch.set_facecolor((0.0, 0.0, 0.0))
-        Pxx, freqs, bins, im = ax.specgram(self.audio_data, NFFT=1024, Fs=16000, noverlap=900)
+        Pxx, freqs, bins, im = ax.specgram(self.audio_data, NFFT=1024, Fs=44100, noverlap=900)
         ax.set_ylabel('Frecuencia [Hz]')
         ax.set_xlabel('Tiempo [s]')
         ax.scatter(t, f)
