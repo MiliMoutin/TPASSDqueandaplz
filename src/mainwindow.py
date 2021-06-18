@@ -95,42 +95,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def begin(self):
         if self.filename:
+            if os.path.exists(self.filename):
+                # Read file to get buffer
+                self.file_data.setText("Finding song...")
+                name, extension = os.path.splitext(self.filename)
+                if extension == '.mp3':
+                    sound = AudioSegment.from_mp3(self.filename)
+                    current_path = os.path.dirname(os.path.abspath(__file__))
+                    self.filename = os.path.join(current_path, "extra_files", "audio_file.wav")
+                    sound.export(self.filename, format="wav")
+                elif extension == '.ogg':
+                    sound = AudioSegment.from_ogg(self.filename)
+                    current_path = os.path.dirname(os.path.abspath(__file__))
+                    self.filename = os.path.join(current_path, "extra_files", "audio_file.wav")
+                    sound.export(self.filename, format="wav")
+                ifile = wave.open(self.filename)
+                samples = ifile.getnframes()
+                audio = ifile.readframes(samples)
 
-            # Read file to get buffer
-            self.file_data.setText("Finding song...")
-            name, extension = os.path.splitext(self.filename)
-            if extension != '.wav':
-                sound = AudioSegment.from_mp3(self.filename)
-                current_path = os.path.dirname(os.path.abspath(__file__))
-                self.filename = os.path.join(current_path, "extra_files", "audio_file.wav")
-                sound.export(self.filename, format="wav")
-            ifile = wave.open(self.filename)
-            samples = ifile.getnframes()
-            audio = ifile.readframes(samples)
+                # Convert buffer to float32 using NumPy
+                audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
+                audio_as_np_float32 = audio_as_np_int16.astype(np.float32)
 
-            # Convert buffer to float32 using NumPy
-            audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
-            audio_as_np_float32 = audio_as_np_int16.astype(np.float32)
+                # Normalise float32 array so that values are between -1.0 and +1.0
+                max_int16 = 2 ** 15
+                audio_normalised = audio_as_np_float32 / max_int16
+                self.audio_data = audio_normalised
 
-            # Normalise float32 array so that values are between -1.0 and +1.0
-            max_int16 = 2 ** 15
-            audio_normalised = audio_as_np_float32 / max_int16
-            self.audio_data = audio_normalised
-
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.get_shazam_data())
-            self.file_data.setText("Song found!")
-            track = self.out.get("track")
-            images = track.get("images")
-            cover_image = images.get("coverart")
-            urllib.request.urlretrieve(cover_image, "sample.png")
-            self.im = QPixmap("sample.png")
-            self.image_out.setPixmap(self.im)
-            title = track.get("title")
-            subtitle = track.get("subtitle")
-            self.title_out.setText(title)
-            self.subtitle_out.setText(subtitle)
-            self.spectrogram()
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(self.get_shazam_data())
+                self.file_data.setText("Song found!")
+                track = self.out.get("track")
+                images = track.get("images")
+                cover_image = images.get("coverart")
+                urllib.request.urlretrieve(cover_image, "sample.png")
+                self.im = QPixmap("sample.png")
+                self.image_out.setPixmap(self.im)
+                title = track.get("title")
+                subtitle = track.get("subtitle")
+                self.title_out.setText(title)
+                self.subtitle_out.setText(subtitle)
+                self.spectrogram()
         else:
             msgbox = QMessageBox(QMessageBox.Information, "No File Selected!", "No se seleccionó un archivo!")
             self.file_data.setText("No file selected!")

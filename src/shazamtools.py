@@ -7,10 +7,11 @@ import contextlib
 import os
 
 def create_audio_recording(seconds = 3, fs = 44100):
-    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1, dtype='int16')
     sd.wait()  # Wait until recording is finished
 
-    filename='mic_input.ogg'
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(current_path, "extra_files", "mic_input.wav")
     with contextlib.suppress(FileNotFoundError):
         os.remove(filename)
 
