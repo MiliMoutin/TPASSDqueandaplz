@@ -53,10 +53,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if reply == QMessageBox.Yes:
                 open = True
         if open:
-            self.filename = QFileDialog.getOpenFileName(self, "Abrir Archivo", "", "Archivo de Audio (*.mp3, *.wav, "
-                                                                                   "*.ogg)")[0]
-            if not self.filename:
+            self.filename = QFileDialog.getOpenFileName(self, "Abrir Archivo", "")[0]
+            if self.filename:
+                self.clear_screen()
                 self.file_data.setText("Audio Selected")
+
+    def clear_screen(self):
+        self.image_out.clear()
+        self.title_out.clear()
+        self.subtitle_out.clear()
 
     def StartRecording(self, seconds=3, fs=44100):
         open = True
@@ -81,6 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             current_path = os.path.dirname(os.path.abspath(__file__))
             self.filename = os.path.join(current_path, "recording", "recording.ogg")
             write(self.filename, fs, myrecording)  # Save as WAV file
+            self.clear_screen()
             self.file_data.setText("Audio selected.")
 
     def begin(self):
@@ -95,11 +101,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             urllib.request.urlretrieve(cover_image, "sample.png")
             self.im = QPixmap("sample.png")
             self.image_out.setPixmap(self.im)
-            title = self.out.get("title")
+            title = track.get("title")
             subtitle = track.get("subtitle")
             self.title_out.setText(title)
-            self.title_out.setText(subtitle)
-
+            self.subtitle_out.setText(subtitle)
+            self.spectrogram()
         else:
             msgbox = QMessageBox(QMessageBox.Information, "No File Selected!", "No se seleccionó un archivo!")
             msgbox.addButton(QMessageBox.Close)
@@ -109,15 +115,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     async def get_shazam_data(self):
         if self.filename:
             file = await sh.utils.load_file(self.filename, 'rb')
-            #self.audio_data = self.normalize_audio_data(file)
+            self.audio_data = sh.converter.Converter.normalize_audio_data(file).raw_data
             self.out = await self.shazam.recognize_song(self.filename)
 
-    def spectrogram(self, data):
+    def spectrogram(self):
 
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6))
         fig.patch.set_facecolor((0.75, 0.75, 0.75))
         ax.patch.set_facecolor((0.0, 0.0, 0.0))
-        Pxx, freqs, bins, im = ax.specgram(data, NFFT=1024, Fs=16000, noverlap=900)
+        Pxx, freqs, bins, im = ax.specgram(self.audio_data, NFFT=1024, Fs=16000, noverlap=900)
         ax.set_ylabel('Frecuencia [Hz]')
         ax.set_xlabel('Tiempo [s]')
         plt.show()

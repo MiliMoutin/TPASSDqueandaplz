@@ -186,7 +186,7 @@ class DecodedMessage:
         }
         #with open('data\\songdata.json', 'w') as outfile:
         #    json.dump(a, outfile)
-        #return a
+        return a
 
     def encode_to_binary(self) -> bytes:
 
