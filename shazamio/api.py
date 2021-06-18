@@ -222,7 +222,7 @@ class Shazam(Converter, Geo):
         signature = signature_generator.get_next_signature()
         while not signature:
             signature = signature_generator.get_next_signature()
-        signature.encode_to_json()
+        a = signature.encode_to_json()
         results = await self.send_recognize_request(signature)
         return results
 
