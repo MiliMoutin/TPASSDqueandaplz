@@ -3,6 +3,7 @@ import uuid
 import time
 import json
 import typing
+import os
 
 from .signature import DecodedMessage
 from .models import Request, ShazamUrl
@@ -225,7 +226,9 @@ class Shazam(Converter, Geo):
         results = await self.send_recognize_request(signature)
         a = signature.encode_to_json()
 
-        with open('..\\examples\\data\\songdata.json', 'w') as outfile:
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        filename = os.path.join(current_path, "..", "src", "extra_files", "songdata.json")
+        with open(filename, 'w') as outfile:
             json.dump(a, outfile)
         return results
 

@@ -24,7 +24,9 @@ def get_peaks():
     frequency = []
     magnitude = []
 
-    f = open('..\\examples\\data\\songdata.json')
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(current_path, "extra_files", "songdata.json")
+    f = open(filename)
     data = json.load(f)
     for freq_ranges in data["frequency_band_to_peaks"].items():
         print(freq_ranges)
