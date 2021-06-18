@@ -165,7 +165,7 @@ class DecodedMessage:
 
     def encode_to_json(self) -> dict:
 
-        a = {
+        return {
             "sample_rate_hz": self.sample_rate_hz,
             "number_samples": self.number_samples,
             "_seconds": self.number_samples / self.sample_rate_hz,
@@ -184,9 +184,6 @@ class DecodedMessage:
                 for frequency_band, frequency_peaks in sorted(self.frequency_band_to_sound_peaks.items())
             }
         }
-        #with open('data\\songdata.json', 'w') as outfile:
-        #    json.dump(a, outfile)
-        #return a
 
     def encode_to_binary(self) -> bytes:
 
