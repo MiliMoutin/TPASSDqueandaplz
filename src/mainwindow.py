@@ -128,9 +128,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 track = self.out.get("track")
                 images = track.get("images")
                 cover_image = images.get("coverart")
-                urllib.request.urlretrieve(cover_image, "sample.png")
-                self.im = QPixmap("sample.png")
-                self.image_out.setPixmap(self.im)
+                try:
+                    urllib.request.urlretrieve(cover_image, "sample.png")
+                    self.im = QPixmap("sample.png")
+                    self.image_out.setPixmap(self.im)
+                except:
+                    self.image_out.setText("No Image Found!")
+
                 title = track.get("title")
                 subtitle = track.get("subtitle")
                 self.title_out.setText(title)
